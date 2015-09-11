@@ -1,0 +1,80 @@
+<!-- <link rel="import" href="../polymer/polymer.html"> -->
+<script src="../../bower_components/strophe/strophe.js"></script>
+<!--
+Element providing a xmpp client
+
+Based on strophe.js
+
+##### Example
+
+    <xmpp-client jid="xyz@jabber.org" pass="xyz" />
+
+@element xmpp-client
+@blurb Element providing a xmpp client
+@status alpha
+@homepage http://h0ru5.github.io/xmpp-client
+-->
+<polymer-element name="xmpp-client" attributes="endpoint jid pass online">
+    <template>
+        <p>I'm an xmpp-client and only have visuals for testing</p>
+    </template>
+  </polymer-element>
+<script type="text/javascript">
+/* jshint ignore:start */
+// Code here will be ignored by JSHint.
+Polymer({
+  is:'xmpp-client',
+  endpoint: 'http://119.9.79.229:5280/http-bind',
+  online: true,
+  jid: 'test@119.9.79.229',
+  pass: 'qwerty',
+  connection: null,
+  ready: function() {
+    console.log('xmpp-client ready, creating connection',this.endpoint);
+    this.connection = new Strophe.Connection(this.endpoint);
+    if (this.online) {this.connect();
+  }
+  },
+  connect: function() {
+    this.online = true;
+    console.log('connecting....');
+    this.connection.connect(this.jid, this.pass, this.throwConnect.bind(this));
+  },
+  disconnect: function() {
+    this.online = false;
+    connction.disconnect();
+  },
+  throwConnect: function(status) {
+    console.log('throwConnect....');
+
+    if (status === Strophe.Status.CONNECTING) {
+      this.constate = "CONNECTING";
+    } else if (status === Strophe.Status.CONNFAIL) {
+      this.constate = "CONFAIL";
+    } else if (status === Strophe.Status.DISCONNECTING) {
+      this.constate = "DISCONNECTING";
+    } else if (status === Strophe.Status.DISCONNECTED) {
+      this.constate = "DISCONNECTED";
+      this.connected = false;
+      this.fire('connect', false);
+    } else if (status === Strophe.Status.CONNECTED) {
+      this.constate = "CONNECTED";
+      this.connected = true;
+      alert('connected');
+      this.fire('connect', true);
+    }
+    this.fire('constate', this.constate);
+  },
+  onlineChanged: function(oV, nV) {
+    console.log("online: " + oV + " -> " + nV);
+    if (nV){
+      this.connect();
+      }
+    else {
+      this.disconnect();
+    }
+  }
+});
+/* jshint ignore:end */
+
+</script>
